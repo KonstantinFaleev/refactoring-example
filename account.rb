@@ -15,8 +15,6 @@ class Account
       puts '- If you want to load account - press `load`'
       puts '- If you want to exit - press `exit`'
 
-    # FIRST SCENARIO. IMPROVEMENT NEEDED
-
     a = gets.chomp
 
     if a == 'create'
@@ -44,7 +42,7 @@ class Account
     @card = []
     new_accounts = accounts << self
     @current_account = self
-    File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+    File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml }
     main_menu
   end
 
@@ -151,7 +149,7 @@ class Account
           }
         end
         cards = @current_account.card << card
-        @current_account.card = cards #important!!!
+        @current_account.card = cards
         new_accounts = []
         accounts.each do |ac|
           if ac.login == @current_account.login
@@ -234,7 +232,7 @@ class Account
             puts 'Input the amount of money you want to withdraw'
             a2 = gets.chomp
             if a2&.to_i.to_i > 0
-              money_left = current_card[:balance] - a2&.to_i.to_i - withdraw_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i)
+              money_left = current_card[:balance] - a2&.to_i.to_i - withdraw_tax(current_card[:type], a2&.to_i.to_i)
               if money_left > 0
                 current_card[:balance] = money_left
                 @current_account.card[answer&.to_i.to_i - 1] = current_card
@@ -247,7 +245,7 @@ class Account
                   end
                 end
                 File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
-                puts "Money #{a2&.to_i.to_i} withdrawed from #{current_card[:number]}$. Money left: #{current_card[:balance]}$. Tax: #{withdraw_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i)}$"
+                puts "Money #{a2&.to_i.to_i} withdrawed from #{current_card[:number]}$. Money left: #{current_card[:balance]}$. Tax: #{withdraw_tax(current_card[:type], a2&.to_i.to_i)}$"
                 return
               else
                 puts "You don't have enough money on card for such operation"
@@ -285,11 +283,11 @@ class Account
             puts 'Input the amount of money you want to put on your card'
             a2 = gets.chomp
             if a2&.to_i.to_i > 0
-              if put_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i) >= a2&.to_i.to_i
+              if put_tax(current_card[:type], a2&.to_i.to_i) >= a2&.to_i.to_i
                 puts 'Your tax is higher than input amount'
                 return
               else
-                new_money_amount = current_card[:balance] + a2&.to_i.to_i - put_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i)
+                new_money_amount = current_card[:balance] + a2&.to_i.to_i - put_tax(current_card[:type], a2&.to_i.to_i)
                 current_card[:balance] = new_money_amount
                 @current_account.card[answer&.to_i.to_i - 1] = current_card
                 new_accounts = []
@@ -300,8 +298,8 @@ class Account
                     new_accounts.push(ac)
                   end
                 end
-                File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
-                puts "Money #{a2&.to_i.to_i} was put on #{current_card[:number]}. Balance: #{current_card[:balance]}. Tax: #{put_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i)}"
+                File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml }
+                puts "Money #{a2&.to_i.to_i} was put on #{current_card[:number]}. Balance: #{current_card[:balance]}. Tax: #{put_tax(current_card[:type], a2&.to_i.to_i)}"
                 return
               end
             else
@@ -359,12 +357,12 @@ class Account
       puts 'Input the amount of money you want to withdraw'
       a3 = gets.chomp
       if a3&.to_i.to_i > 0
-        sender_balance = sender_card[:balance] - a3&.to_i.to_i - sender_tax(sender_card[:type], sender_card[:balance], sender_card[:number], a3&.to_i.to_i)
-        recipient_balance = recipient_card[:balance] + a3&.to_i.to_i - put_tax(recipient_card[:type], recipient_card[:balance], recipient_card[:number], a3&.to_i.to_i)
+        sender_balance = sender_card[:balance] - a3&.to_i.to_i - sender_tax(sender_card[:type], a3&.to_i.to_i)
+        recipient_balance = recipient_card[:balance] + a3&.to_i.to_i - put_tax(recipient_card[:type], a3&.to_i.to_i)
 
         if sender_balance < 0
           puts "You don't have enough money on card for such operation"
-        elsif put_tax(recipient_card[:type], recipient_card[:balance], recipient_card[:number], a3&.to_i.to_i) >= a3&.to_i.to_i
+        elsif put_tax(recipient_card[:type], a3&.to_i.to_i) >= a3&.to_i.to_i
           puts 'There is no enough money on sender card'
         else
           sender_card[:balance] = sender_balance
@@ -386,9 +384,9 @@ class Account
               new_accounts.push(recipient)
             end
           end
-          File.open('accounts.yml', 'w') { |f| f.write new_accounts.to_yaml } #Storing
-          puts "Money #{a3&.to_i.to_i}$ was put on #{sender_card[:number]}. Balance: #{recipient_balance}. Tax: #{put_tax(sender_card[:type], sender_card[:balance], sender_card[:number], a3&.to_i.to_i)}$\n"
-          puts "Money #{a3&.to_i.to_i}$ was put on #{a2}. Balance: #{sender_balance}. Tax: #{sender_tax(sender_card[:type], sender_card[:balance], sender_card[:number], a3&.to_i.to_i)}$\n"
+          File.open('accounts.yml', 'w') { |f| f.write new_accounts.to_yaml }
+          puts "Money #{a3&.to_i.to_i}$ was put on #{sender_card[:number]}. Balance: #{recipient_balance}. Tax: #{put_tax(sender_card[:type], a3&.to_i.to_i)}$\n"
+          puts "Money #{a3&.to_i.to_i}$ was put on #{a2}. Balance: #{sender_balance}. Tax: #{sender_tax(sender_card[:type], a3&.to_i.to_i)}$\n"
           break
         end
       else
@@ -408,7 +406,7 @@ class Account
           new_accounts.push(ac)
         end
       end
-      File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+      File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml }
     end
   end
 
@@ -476,7 +474,7 @@ class Account
     end
   end
 
-  def withdraw_tax(type, balance, number, amount)
+  def withdraw_tax(type, amount)
     if type == 'usual'
       return amount * 0.05
     elsif type == 'capitalist'
@@ -487,7 +485,7 @@ class Account
     0
   end
 
-  def put_tax(type, balance, number, amount)
+  def put_tax(type, amount)
     if type == 'usual'
       return amount * 0.02
     elsif type == 'capitalist'
@@ -498,7 +496,7 @@ class Account
     0
   end
 
-  def sender_tax(type, balance, number, amount)
+  def sender_tax(type, amount)
     if type == 'usual'
       return 20
     elsif type == 'capitalist'
