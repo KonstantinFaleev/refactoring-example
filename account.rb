@@ -72,9 +72,9 @@ class Account
   def create_the_first_account
     puts 'There is no active accounts, do you want to be the first?[y/n]'
     if gets.chomp == 'y'
-      return create
+      create
     else
-      return console
+      console
     end
   end
 
@@ -91,28 +91,25 @@ class Account
       puts '- destroy account - press `DA`'
       puts '- exit from account - press `exit`'
 
-      command = gets.chomp
-
-      if command == 'SC' || command == 'CC' || command == 'DC' || command == 'PM' || command == 'WM' || command == 'SM' || command == 'DA' || command == 'exit'
-        if command == 'SC'
-          show_cards
-        elsif command == 'CC'
-          create_card
-        elsif command == 'DC'
-          destroy_card
-        elsif command == 'PM'
-          put_money
-        elsif command == 'WM'
-          withdraw_money
-        elsif command == 'SM'
-          send_money
-        elsif command == 'DA'
-          destroy_account
-          exit
-        elsif command == 'exit'
-          exit
-          break
-        end
+      case gets.chomp
+      when 'SC'
+        show_cards
+      when 'CC'
+        create_card
+      when 'DC'
+        destroy_card
+      when 'PM'
+        put_money
+      when 'WM'
+        withdraw_money
+      when 'SM'
+        send_money
+      when 'DA'
+        destroy_account
+        exit
+      when 'exit'
+        exit
+        break
       else
         puts "Wrong command. Try again!\n"
       end
