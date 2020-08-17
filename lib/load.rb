@@ -1,0 +1,6 @@
+require 'yaml'
+require 'pry'
+require 'i18n'
+require_relative 'config/i18n_config'
+require_relative 'console'
+require_relative 'account'

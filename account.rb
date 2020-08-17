@@ -1,5 +1,4 @@
-require 'yaml'
-require 'pry'
+require_relative 'lib/load'
 
 class Account
   attr_accessor :login, :name, :card, :password, :file_path
@@ -10,10 +9,7 @@ class Account
   end
 
   def console
-      puts 'Hello, we are RubyG bank!'
-      puts '- If you want to create account - press `create`'
-      puts '- If you want to load account - press `load`'
-      puts '- If you want to exit - press `exit`'
+    puts I18n.t(:hello_message)
 
     a = gets.chomp
 
@@ -52,9 +48,9 @@ class Account
         return create_the_first_account
       end
 
-      puts 'Enter your login'
+      puts I18n.t(:login_input)
       login = gets.chomp
-      puts 'Enter your password'
+      puts I18n.t(:password_input)
       password = gets.chomp
 
       if accounts.map { |a| { login: a.login, password: a.password } }.include?({ login: login, password: password })
@@ -62,7 +58,7 @@ class Account
         @current_account = a
         break
       else
-        puts 'There is no account with given credentials'
+        puts I18n.t(:load_error)
         next
       end
     end
@@ -70,7 +66,7 @@ class Account
   end
 
   def create_the_first_account
-    puts 'There is no active accounts, do you want to be the first?[y/n]'
+    puts I18n.t(:create_the_first_account)
     if gets.chomp == 'y'
       create
     else
@@ -80,16 +76,7 @@ class Account
 
   def main_menu
     loop do
-      puts "\nWelcome, #{@current_account.name}"
-      puts 'If you want to:'
-      puts '- show all cards - press SC'
-      puts '- create card - press CC'
-      puts '- destroy card - press DC'
-      puts '- put money on card - press PM'
-      puts '- withdraw money on card - press WM'
-      puts '- send money to another card  - press SM'
-      puts '- destroy account - press `DA`'
-      puts '- exit from account - press `exit`'
+      puts I18n.t(:main_menu_message, name: "#{@current_account.name}")
 
       case gets.chomp
       when 'SC'
@@ -111,18 +98,14 @@ class Account
         exit
         break
       else
-        puts "Wrong command. Try again!\n"
+        puts I18n.t(:wrong_command)
       end
     end
   end
 
   def create_card
     loop do
-      puts 'You could create one of 3 card types'
-      puts '- Usual card. 2% tax on card INCOME. 20$ tax on SENDING money from this card. 5% tax on WITHDRAWING money. For creation this card - press `usual`'
-      puts '- Capitalist card. 10$ tax on card INCOME. 10% tax on SENDING money from this card. 4$ tax on WITHDRAWING money. For creation this card - press `capitalist`'
-      puts '- Virtual card. 1$ tax on card INCOME. 1$ tax on SENDING money from this card. 12% tax on WITHDRAWING money. For creation this card - press `virtual`'
-      puts '- For exit - press `exit`'
+      puts I18n.t(:create_card_message)
 
       ct = gets.chomp
       if ct == 'usual' || ct == 'capitalist' || ct == 'virtual'
@@ -158,7 +141,7 @@ class Account
         File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
         break
       else
-        puts "Wrong card type. Try again!\n"
+        puts I18n.t(:wrong_card_type)
       end
     end
   end
@@ -166,16 +149,16 @@ class Account
   def destroy_card
     loop do
       if @current_account.card.any?
-        puts 'If you want to delete:'
+        puts I18n.t(:want_to_delete)
 
         @current_account.card.each_with_index do |c, i|
-          puts "- #{c[:number]}, #{c[:type]}, press #{i + 1}"
+          puts I18n.t(:list_cards, card: "#{c[:number]}", type: "#{c[:type]}", index: "#{i + 1}")
         end
         puts "press `exit` to exit\n"
         answer = gets.chomp
         break if answer == 'exit'
         if answer&.to_i.to_i <= @current_account.card.length && answer&.to_i.to_i > 0
-          puts "Are you sure you want to delete #{@current_account.card[answer&.to_i.to_i - 1][:number]}?[y/n]"
+          puts I18n.t(:accept_delete_account, card_number: "#{@current_account.card[answer&.to_i.to_i - 1][:number]}?[y/n]")
           a2 = gets.chomp
           if a2 == 'y'
             @current_account.card.delete_at(answer&.to_i.to_i - 1)
@@ -193,10 +176,10 @@ class Account
             return
           end
         else
-          puts "You entered wrong number!\n"
+          puts I18n.t(:wrong_number_input)
         end
       else
-        puts "There is no active cards!\n"
+        puts I18n.t(:active_card_error)
         break
       end
     end
@@ -208,25 +191,25 @@ class Account
         puts "- #{c[:number]}, #{c[:type]}"
       end
     else
-      puts "There is no active cards!\n"
+      puts I18n.t(:active_card_error)
     end
   end
 
   def withdraw_money
-    puts 'Choose the card for withdrawing:'
-    answer, a2, a3 = nil #answers for gets.chomp
+    puts I18n.t(:choose_card_withdraw)
+    answer, a2, a3 = nil
     if @current_account.card.any?
       @current_account.card.each_with_index do |c, i|
-        puts "- #{c[:number]}, #{c[:type]}, press #{i + 1}"
+        puts I18n.t(:list_cards, card: "#{c[:number]}", type: "#{c[:type]}", index: "#{i + 1}")
       end
-      puts "press `exit` to exit\n"
+      puts I18n.t(:exit_msg)
       loop do
         answer = gets.chomp
         break if answer == 'exit'
         if answer&.to_i.to_i <= @current_account.card.length && answer&.to_i.to_i > 0
           current_card = @current_account.card[answer&.to_i.to_i - 1]
           loop do
-            puts 'Input the amount of money you want to withdraw'
+            puts I18n.t(:money_amount_to_withdraw)
             a2 = gets.chomp
             if a2&.to_i.to_i > 0
               money_left = current_card[:balance] - a2&.to_i.to_i - withdraw_tax(current_card[:type], a2&.to_i.to_i)
@@ -242,46 +225,46 @@ class Account
                   end
                 end
                 File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
-                puts "Money #{a2&.to_i.to_i} withdrawed from #{current_card[:number]}$. Money left: #{current_card[:balance]}$. Tax: #{withdraw_tax(current_card[:type], a2&.to_i.to_i)}$"
+                puts I18n.t(:withdraw_money_message, money: "#{a2&.to_i.to_i}", current_card: "#{current_card[:number]}", balance: "#{current_card[:balance]}", tax: "#{withdraw_tax(current_card[:type], a2&.to_i.to_i)}")
                 return
               else
-                puts "You don't have enough money on card for such operation"
+                puts I18n.t(:money_amount_error)
                 return
               end
             else
-              puts 'You must input correct amount of $'
+              puts I18n.t(:uncorrect_input_amount)
               return
             end
           end
         else
-          puts "You entered wrong number!\n"
+          puts I18n.t(:wrong_number_input)
           return
         end
       end
     else
-      puts "There is no active cards!\n"
+      puts I18n.t(:active_card_error)
     end
   end
 
   def put_money
-    puts 'Choose the card for putting:'
+    puts I18n.t(:choose_card_putting)
 
     if @current_account.card.any?
       @current_account.card.each_with_index do |c, i|
-        puts "- #{c[:number]}, #{c[:type]}, press #{i + 1}"
+        puts I18n.t(:list_cards, card: "#{c[:number]}", type: "#{c[:type]}", index: "#{i + 1}")
       end
-      puts "press `exit` to exit\n"
+      puts I18n.t(:exit_msg)
       loop do
         answer = gets.chomp
         break if answer == 'exit'
         if answer&.to_i.to_i <= @current_account.card.length && answer&.to_i.to_i > 0
           current_card = @current_account.card[answer&.to_i.to_i - 1]
           loop do
-            puts 'Input the amount of money you want to put on your card'
+            puts I18n.t(:puts_money_amount)
             a2 = gets.chomp
             if a2&.to_i.to_i > 0
               if put_tax(current_card[:type], a2&.to_i.to_i) >= a2&.to_i.to_i
-                puts 'Your tax is higher than input amount'
+                puts I18n.t(:high_tax_error)
                 return
               else
                 new_money_amount = current_card[:balance] + a2&.to_i.to_i - put_tax(current_card[:type], a2&.to_i.to_i)
@@ -296,71 +279,71 @@ class Account
                   end
                 end
                 File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml }
-                puts "Money #{a2&.to_i.to_i} was put on #{current_card[:number]}. Balance: #{current_card[:balance]}. Tax: #{put_tax(current_card[:type], a2&.to_i.to_i)}"
+                puts I18n.t(:put_money_message, money: "#{a2&.to_i.to_i}", card: "#{current_card[:number]}", balance: "#{current_card[:balance]}", tax: "#{put_tax(current_card[:type], a2&.to_i.to_i)}")
                 return
               end
             else
-              puts 'You must input correct amount of money'
+              puts I18n.t(:uncorrect_puts_input_amount)
               return
             end
           end
         else
-          puts "You entered wrong number!\n"
+          puts I18n.t(:wrong_number_input)
           return
         end
       end
     else
-      puts "There is no active cards!\n"
+      puts I18n.t(:active_card_error)
     end
   end
 
   def send_money
-    puts 'Choose the card for sending:'
+    puts I18n.t(:choose_send_card)
 
     if @current_account.card.any?
       @current_account.card.each_with_index do |c, i|
-        puts "- #{c[:number]}, #{c[:type]}, press #{i + 1}"
+        puts I18n.t(:list_cards, card: "#{c[:number]}", type: "#{c[:type]}", index: "#{i + 1}")
       end
-      puts "press `exit` to exit\n"
+      puts I18n.t(:exit_msg)
       answer = gets.chomp
       exit if answer == 'exit'
       if answer&.to_i.to_i <= @current_account.card.length && answer&.to_i.to_i > 0
         sender_card = @current_account.card[answer&.to_i.to_i - 1]
       else
-        puts 'Choose correct card'
+        puts I18n.t(:choose_correct_card)
         return
       end
     else
-      puts "There is no active cards!\n"
+      puts I18n.t(:active_card_error)
       return
     end
 
-    puts 'Enter the recipient card:'
+    puts I18n.t(:enter_recipient_card)
     a2 = gets.chomp
     if a2.length > 15 && a2.length < 17
       all_cards = accounts.map(&:card).flatten
       if all_cards.select { |card| card[:number] == a2 }.any?
         recipient_card = all_cards.select { |card| card[:number] == a2 }.first
       else
-        puts "There is no card with number #{a2}\n"
+        puts I18n.t(:card_not_exist, number: "#{a2}")
         return
       end
     else
-      puts 'Please, input correct number of card'
+      puts I18n.t(:correct_number_card_error)
       return
     end
 
     loop do
-      puts 'Input the amount of money you want to withdraw'
+      puts I18n.t(:money_amount_to_withdraw)
       a3 = gets.chomp
       if a3&.to_i.to_i > 0
         sender_balance = sender_card[:balance] - a3&.to_i.to_i - sender_tax(sender_card[:type], a3&.to_i.to_i)
         recipient_balance = recipient_card[:balance] + a3&.to_i.to_i - put_tax(recipient_card[:type], a3&.to_i.to_i)
 
         if sender_balance < 0
-          puts "You don't have enough money on card for such operation"
+          puts I18n.t(:money_amount_error)
         elsif put_tax(recipient_card[:type], a3&.to_i.to_i) >= a3&.to_i.to_i
-          puts 'There is no enough money on sender card'
+          puts I18n.t(:sender_card_amount_error)
         else
           sender_card[:balance] = sender_balance
           @current_account.card[answer&.to_i.to_i - 1] = sender_card
@@ -382,18 +365,18 @@ class Account
             end
           end
           File.open('accounts.yml', 'w') { |f| f.write new_accounts.to_yaml }
-          puts "Money #{a3&.to_i.to_i}$ was put on #{sender_card[:number]}. Balance: #{recipient_balance}. Tax: #{put_tax(sender_card[:type], a3&.to_i.to_i)}$\n"
-          puts "Money #{a3&.to_i.to_i}$ was put on #{a2}. Balance: #{sender_balance}. Tax: #{sender_tax(sender_card[:type], a3&.to_i.to_i)}$\n"
+          puts I18n.t(:put_money_message, money: "#{sender_card[:number]}", card: "#{recipient_balance}", balance: "#{recipient_balance}", tax: "#{put_tax(sender_card[:type], a3&.to_i.to_i)}")
+          puts I18n.t(:put_money_message, money: "#{a3&.to_i.to_i}", card: "#{a2}", balance: "#{sender_balance}", tax: "#{sender_tax(sender_card[:type], a3&.to_i.to_i)}")
           break
         end
       else
-        puts 'You entered wrong number!\n'
+        puts I18n.t(:wrong_number_input)
       end
     end
   end
 
   def destroy_account
-    puts 'Are you sure you want to destroy account?[y/n]'
+    puts I18n.t(:destroy_account)
     a = gets.chomp
     if a == 'y'
       new_accounts = []
@@ -410,56 +393,56 @@ class Account
   private
 
   def name_input
-    puts 'Enter your name'
+    puts I18n.t(:name_input)
     @name = gets.chomp
     unless @name != '' && @name[0].upcase == @name[0]
-      @errors.push('Your name must not be empty and starts with first upcase letter')
+      @errors.push(I18n.t(:empty_name_error))
     end
   end
 
   def login_input
-    puts 'Enter your login'
+    puts I18n.t(:login_input)
     @login = gets.chomp
     if @login == ''
-      @errors.push('Login must present')
+      @errors.push(I18n.t(:login_present_error))
     end
 
     if @login.length < 4
-      @errors.push('Login must be longer then 4 symbols')
+      @errors.push(I18n.t(:length_name_error))
     end
 
     if @login.length > 20
-      @errors.push('Login must be shorter then 20 symbols')
+      @errors.push(I18n.t(:short_name_error))
     end
 
     if accounts.map { |a| a.login }.include? @login
-      @errors.push('Such account is already exists')
+      @errors.push(I18n.t(:account_exist_error))
     end
   end
 
   def password_input
-    puts 'Enter your password'
+    puts I18n.t(:password_input)
     @password = gets.chomp
     if @password == ''
-      @errors.push('Password must present')
+      @errors.push(I18n.t(:password_present_error))
     end
 
     if @password.length < 6
-      @errors.push('Password must be longer then 6 symbols')
+      @errors.push(I18n.t(:password_longer_error))
     end
 
     if @password.length > 30
-      @errors.push('Password must be shorter then 30 symbols')
+      @errors.push(I18n.t(:password_shorter_error))
     end
   end
 
   def age_input
-    puts 'Enter your age'
+    puts I18n.t(:age_input)
     @age = gets.chomp
     if @age.to_i.is_a?(Integer) && @age.to_i >= 23 && @age.to_i <= 90
       @age = @age.to_i
     else
-      @errors.push('Your Age must be greeter then 23 and lower then 90')
+      @errors.push(I18n.t(:age_error))
     end
   end
 
