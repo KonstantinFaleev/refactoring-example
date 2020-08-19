@@ -1,61 +1,37 @@
 version: 2.1
-
-executors:
-  default:
-    working_directory: ~/refactoring-example
-    description: Refactoring RG
+jobs:
+  build:
     docker:
       - image: circleci/ruby:2.7.1
 
-caches:
-  - &bundle_cache v1-refactoring-example-{{ checksum "Gemfile.lock" }}
-
-commands:
-  setup_environment:
     steps:
       - checkout
+
       - restore_cache:
-          key: *bundle_cache
-      - run: bundle install --path vendor/bundle
+          keys:
+            - gem-cache-v1-{{ checksum "Gemfile.lock" }}
+            - gem-cache-v1-
+
+      - run:
+          name: Install dependencies
+          command: |
+            gem install bundler
+            bundle install --path vendor/bundle
       - save_cache:
+          key: gem-cache-v1-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-          key: *bundle_cache
 
-  run_linters:
-    description: Lintering
-    steps:
+      run_linters:
+        description: Lintering
+        steps:
+          - run:
+              name: rubocop
+              command: bundle exec rubocop
+          - run:
+              name: fasterer
+              command: bundle exec fasterer
+
       - run:
-          name: rubocop
-          command: bundle exec rubocop
-      - run:
-          name: fasterer
-          command: bundle exec fasterer
-
-  run_specs:
-    steps:
-      - run:
-          name: run specs
-          command: bundle exec rspec --format progress spec
-
-jobs:
-  lintering:
-    executor: default
-    steps:
-      - setup_environment
-      - run_linters
-
-  run_specs:
-    executor: default
-    steps:
-      - setup_environment
-      - run_specs
-
-workflows:
-  version: 2.1
-  build:
-    jobs:
-      - lintering
-      - run_specs:
-          requires:
-            - lintering
+          name: Run tests
+          command: bundle exec rspec
