@@ -1,37 +1,62 @@
 version: 2.1
-jobs:
-  build:
+
+executors:
+  default:
+    working_directory: ~/repo
     docker:
       - image: circleci/ruby:2.7.1
 
+caches:
+  - &bundle_cache_full v1-gem-cache-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+  - &bundle_cache_branch v1-gem-cache-{{ .Branch }}
+  - &bundle_cache_repo v1-gem-cache
+
+commands:
+  setup_environment:
     steps:
       - checkout
-
       - restore_cache:
           keys:
-            - gem-cache-v1-{{ checksum "Gemfile.lock" }}
-            - gem-cache-v1-
-
-      - run:
-          name: Install dependencies
-          command: |
-            gem install bundler
-            bundle install --path vendor/bundle
+            - *bundle_cache_full
+            - *bundle_cache_branch
+            - *bundle_cache_repo
+      - run: bundle config set path vendor/bundle
+      - run: bundle install
       - save_cache:
-          key: gem-cache-v1-{{ checksum "Gemfile.lock" }}
+          key: *bundle_cache_full
           paths:
             - vendor/bundle
-
-      run_linters:
-        description: Lintering
-        steps:
-          - run:
-              name: rubocop
-              command: bundle exec rubocop
-          - run:
-              name: fasterer
-              command: bundle exec fasterer
-
+  run_linters:
+    steps:
       - run:
-          name: Run tests
-          command: bundle exec rspec
+          name: linters
+          command: bundle exec rake lint
+  run_specs:
+    steps:
+      - run:
+          name: specs
+          command: bundle exec rake spec
+      - store_artifacts:
+          path: ~/repo/coverage
+          destination: coverage
+
+jobs:
+  lintering:
+    executor: default
+    steps:
+      - setup_environment
+      - run_linters
+  testing:
+    executor: default
+    steps:
+      - setup_environment
+      - run_specs
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - lintering
+      - testing:
+          requires:
+            - lintering
