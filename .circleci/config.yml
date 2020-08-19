@@ -1,0 +1,61 @@
+version: 2.1
+
+executors:
+  default:
+    working_directory: ~/refactoring-example
+    description: Refactoring RG
+    docker:
+      - image: circleci/ruby:2.7.1
+
+caches:
+  - &bundle_cache v1-codebreaker-web-{{ checksum "Gemfile.lock" }}
+
+commands:
+  setup_environment:
+    steps:
+      - checkout
+      - restore_cache:
+          key: *bundle_cache
+      - run: bundle install --path vendor/bundle
+      - save_cache:
+          paths:
+            - vendor/bundle
+          key: *bundle_cache
+
+  run_linters:
+    description: Lintering
+    steps:
+      - run:
+          name: rubocop
+          command: bundle exec rubocop
+      - run:
+          name: fasterer
+          command: bundle exec fasterer
+
+  run_specs:
+    steps:
+      - run:
+          name: run specs
+          command: bundle exec rspec --format progress spec
+
+jobs:
+  lintering:
+    executor: default
+    steps:
+      - setup_environment
+      - run_linters
+
+  run_specs:
+    executor: default
+    steps:
+      - setup_environment
+      - run_specs
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - lintering
+      - run_specs:
+          requires:
+            - lintering
