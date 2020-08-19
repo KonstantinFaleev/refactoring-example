@@ -1,3 +1,3 @@
-require_relative 'account'
+require_relative 'load'
 
-Account.new.console
+Console.new.console
