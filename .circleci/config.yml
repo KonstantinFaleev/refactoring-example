@@ -8,7 +8,7 @@ executors:
       - image: circleci/ruby:2.7.1
 
 caches:
-  - &bundle_cache v1-codebreaker-web-{{ checksum "Gemfile.lock" }}
+  - &bundle_cache v1-refactoring-example-{{ checksum "Gemfile.lock" }}
 
 commands:
   setup_environment:
