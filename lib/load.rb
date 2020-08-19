@@ -10,9 +10,9 @@ require_relative '../config/app_config'
 require_relative 'helpers/db_helper'
 require_relative 'helpers/validation_helper'
 
-require_relative 'validators/card_validator'
-require_relative 'validators/account_validator'
-require_relative 'validators/transaction_validator'
+require_relative 'validation/card_validator'
+require_relative 'validation/account_validator'
+require_relative 'validation/transaction_validator'
 
 require_relative 'app/view'
 
