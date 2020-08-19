@@ -1,3 +1,5 @@
-require_relative 'load'
+# frozen_string_literal: true
 
-Console.new.console
+require_relative 'lib/load'
+
+Console.new.run
