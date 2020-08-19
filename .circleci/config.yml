@@ -33,9 +33,6 @@ commands:
       - run:
           name: rubocop
           command: bundle exec rubocop
-      - run:
-          name: fasterer
-          command: bundle exec fasterer
 
   run_specs:
     steps:
