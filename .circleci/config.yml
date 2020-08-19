@@ -19,7 +19,7 @@ commands:
           keys:
             - *bundle_cache_full
             - *bundle_cache
-      - run: bundle install --path vendor/bundle
+      - run: bundle install
       - save_cache:
           key: *bundle_cache_full
           paths:
