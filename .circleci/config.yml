@@ -28,10 +28,15 @@ commands:
           paths:
             - vendor/bundle
   run_linters:
+    description: Lintering
     steps:
       - run:
-          name: linters
-          command: bundle exec rake lint
+          name: rubocop
+          command: bundle exec rubocop
+      - run:
+          name: fasterer
+          command: bundle exec fasterer
+
   run_specs:
     steps:
       - run:
