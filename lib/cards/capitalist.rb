@@ -2,6 +2,10 @@
 
 module Cards
   class Capitalist < Base
+    WITHDRAW_PERCENT = 4
+    PUT_FIXED = 10
+    SENDER_PERCENT = 10
+
     def initialize(balance: 100)
       super
 
@@ -23,15 +27,15 @@ module Cards
     private
 
     def withdraw_percent
-      4
+      WITHDRAW_PERCENT
     end
 
     def put_fixed
-      10
+      PUT_FIXED
     end
 
     def send_percent
-      10
+      SENDER_PERCENT
     end
   end
 end

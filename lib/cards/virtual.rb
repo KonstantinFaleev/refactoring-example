@@ -2,6 +2,10 @@
 
 module Cards
   class Virtual < Base
+    WITHDRAW_PERCENT = 88
+    PUT_FIXED = 1
+    SENDER_PERCENT = 1
+
     def initialize(balance: 150)
       super
 
@@ -23,15 +27,15 @@ module Cards
     private
 
     def withdraw_percent
-      88
+      WITHDRAW_PERCENT
     end
 
     def put_fixed
-      1
+      PUT_FIXED
     end
 
     def send_fixed
-      1
+      SENDER_PERCENT
     end
   end
 end

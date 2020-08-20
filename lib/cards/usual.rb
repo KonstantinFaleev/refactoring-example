@@ -2,6 +2,10 @@
 
 module Cards
   class Usual < Base
+    WITHDRAW_PERCENT = 5
+    PUT_FIXED = 2
+    SENDER_PERCENT = 20
+
     def initialize(balance: 50)
       super
 
@@ -23,15 +27,15 @@ module Cards
     private
 
     def withdraw_percent
-      5
+      WITHDRAW_PERCENT
     end
 
     def put_percent
-      2
+      PUT_FIXED
     end
 
     def send_fixed
-      20
+      SENDER_PERCENT
     end
   end
 end

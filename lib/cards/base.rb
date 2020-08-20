@@ -4,6 +4,13 @@ module Cards
   class Base
     NUMBER_LENGTH = 16
 
+    WITHDRAW_PERCENT = 0
+    WITHDRAW_FIXED = 0
+    PUT_PERCENT = 0
+    PUT_FIXED = 0
+    SENDER_PERCENT = 0
+    SENDER_FIXED = 0
+
     attr_accessor :balance
     attr_reader :number, :taxes
 
@@ -30,27 +37,27 @@ module Cards
     end
 
     def put_fixed
-      0
+      PUT_FIXED
     end
 
     def put_percent
-      0
+      PUT_PERCENT
     end
 
     def withdraw_fixed
-      0
+      WITHDRAW_FIXED
     end
 
     def withdraw_percent
-      0
+      WITHDRAW_PERCENT
     end
 
     def send_fixed
-      0
+      SENDER_FIXED
     end
 
     def send_percent
-      0
+      SENDER_PERCENT
     end
   end
 end
