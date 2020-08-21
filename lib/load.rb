@@ -5,8 +5,6 @@ require 'yaml'
 require 'pry'
 require 'digest'
 
-require_relative '../config/app_config'
-
 require_relative 'helpers/db_helper'
 require_relative 'helpers/validation_helper'
 

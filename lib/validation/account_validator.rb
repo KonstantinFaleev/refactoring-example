@@ -2,6 +2,9 @@
 
 class AccountValidator
   TRUSTED_LOGIN_ATTEMPTS_COUNT = 3
+  LOGIN_LENGTH_RANGE           = (4..20).to_a.freeze
+  PASSWORD_LENGTH_RANGE        = (6..30).to_a.freeze
+  AGE_RANGE                    = (23..90).to_a.freeze
 
   class << self
     include ValidationHelper

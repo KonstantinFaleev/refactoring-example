@@ -52,7 +52,7 @@ RSpec.describe Account do
 
   let(:console) { Console.new }
   let(:garbage) { (0...8).map { rand(65..90).chr }.join }
-  let(:app_commands) { ConsoleAppConfig::COMMANDS }
+  let(:app_commands) { Console::COMMANDS }
 
   before do
     allow(STDOUT).to receive(:print).with(VIEW::INVITE)
@@ -126,7 +126,7 @@ RSpec.describe Account do
         allow(console).to receive(:account_menu)
         allow(console).to receive(:accounts).and_return([])
 
-        stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+        stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
       end
 
       after do
@@ -168,7 +168,7 @@ RSpec.describe Account do
         allow(console).to receive(:account_menu)
         allow(console).to receive(:accounts).and_return([])
 
-        stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+        stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
       end
 
       context 'with name errors' do
@@ -440,7 +440,7 @@ RSpec.describe Account do
         expect(console).to receive_message_chain(:gets, :strip) { success_input }
         expect(described_class).to receive(:accounts) { accounts }
 
-        stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+        stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
         console.instance_variable_set(:@current_account, instance_double('Account', login: correct_login))
 
         console.destroy_account
@@ -501,7 +501,7 @@ RSpec.describe Account do
     end
 
     before do
-      stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+      stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
     end
 
     context 'with correct output' do
@@ -647,7 +647,7 @@ RSpec.describe Account do
         let(:deletable_card_number) { 1 }
 
         before do
-          stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+          stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
           fake_account.instance_variable_set(:@cards, fake_cards)
 
           allow(described_class).to receive(:accounts) { [fake_account] }
@@ -818,7 +818,7 @@ RSpec.describe Account do
             before do
               allow(described_class).to receive(:accounts) { [fake_account] }
 
-              stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+              stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
             end
 
             after do
@@ -860,7 +860,7 @@ RSpec.describe Account do
     end
 
     before do
-      stub_const('ConsoleAppConfig::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
+      stub_const('DBHelper::ACCOUNTS_PATH', OVERRIDABLE_FILENAME)
     end
 
     after do

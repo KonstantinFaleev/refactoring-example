@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DBHelper
-  prepend ConsoleAppConfig
+  ACCOUNTS_PATH = 'db/accounts.yml'
 
   private
 
