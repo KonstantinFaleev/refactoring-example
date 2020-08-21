@@ -1,5 +1,11 @@
 require: rubocop-rspec
 
+AllCops:
+  NewCops: enable
+  Exclude:
+    - spec/**/*.rb
+    - vendor/**/*
+
 RSpec/MessageChain:
   Enabled: false
 
